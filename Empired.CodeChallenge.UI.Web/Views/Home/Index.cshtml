@@ -1,0 +1,150 @@
+﻿@model AnimalViewModel
+
+@{
+    ViewBag.Title = "Animal Page";
+}
+@section scripts{
+    <script type="text/javascript">
+        function getName() {
+            alert('here');
+            var data = {
+                Uniqueness: $('#uniqueness').val(),
+                Behaviour: $('#behaviour').val(),
+                Colour: $('#colour').val()
+            };
+            var url = '@Url.HttpRouteUrl("GetName", new { })';
+            $.post(url, data, function(result) {
+                    $('#name').text(result);
+                    $('#found').show();
+                    $('#notfound').hide();
+                }).fail(function() {
+                    $('#found').hide();
+                    $('#notfound').show();
+                });
+        }
+
+        function reset() {
+            $('#animalName').val('');
+            $('#animalUniqueness').val('');
+            $('#animalBehaviour').val('');
+            $('#animalColour').val('');
+        }
+
+        function save() {
+            var data = {
+                Name: $('#animalName').val(),
+                Uniqueness: $('#animalUniqueness').val(),
+                Behaviour: $('#animalBehaviour').val(),
+                Colour: $('#animalColour').val()
+            };
+            var url = '@Url.HttpRouteUrl("Save", new { })';
+            $.post(url, data, function (data) {
+                updateNames($('#animals'), data.Names);
+                updateDropdown($('#uniqueness'), data.Uniqueness);
+                updateDropdown($('#behaviour'), data.Behaviours);
+                updateDropdown($('#colours'), data.Colours);
+                reset();
+            }).fail(function() {
+                alert('The record could not be saved');
+            });
+        
+        }
+
+        function updateNames(el, collection) {
+            el.empty();
+            for (var i = 0; i< collection.length; i++) {
+                el.append($('<li>' + collection[i] + '</li>'));
+            }
+        }
+
+        function updateDropdown(el, collection) {
+            el.empty();
+            el.append($('<option>', { text: '', value: '' }));
+            for (var i = 0; i < collection.length; i++) {
+                var item = collection[i];
+                el.append($('<option>', { text: item, value:item }));
+            }
+        }
+    </script>
+}
+<div class="row">
+    <div class="col-md-4">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
+            <li><a data-toggle="tab" href="#questions">Questions</a></li>
+            <li><a data-toggle="tab" href="#add">Add</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="home" class="tab-pane fade in active">
+                <h2>Animals</h2>
+                <p>These are the list animals availables</p>
+                <ul id="animals">
+                    @foreach (var item in Model.Names)
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
+            </div>
+            <div id="questions" class="tab-pane fade">
+                <h2>Attributes</h2>
+                <div class="form-group">
+                    <label for="uniqueness">Uniqueness</label>
+                    <select id="uniqueness" class="form-control">
+                        <option value=""></option>
+                        @foreach (var item in Model.Uniqueness)
+                        {
+                            <option>@item</option>
+                        }
+                    </select>
+                </div>
+         `       <div class="form-group">
+                    <label for="behaviour">Behaviour</label>
+                    <select id="behaviour" class="form-control">
+                        <option value=""></option>
+                        @foreach (var item in Model.Behaviours)
+                        {
+                            <option>@item</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="colour">Colour</label>
+                    <select id="colour" class="form-control">
+                        <option value=""></option>
+                        @foreach (var item in Model.Colours)
+                        {
+                            <option>@item</option>
+                        }
+                    </select>
+                </div>
+                <button type="button" class="btn" onclick="getName();">Search</button>
+                <div>
+                    <div id="found" style="display:none">The animal you seek is <span id="name"></span></div>
+                    <div id="notfound" style="display:none">The animal you seek could not be found</div>
+                </div>
+            </div>
+            <div id="add" class="tab-pane fade">
+                <h2>New Animal</h2>
+                <div class="form-group">
+                    <label for="animalName">Name</label>
+                    <input class="form-control" id="animalName" />
+                </div>
+                <div class="form-group">
+                    <label for="animalUniqueness">Uniqueness</label>
+                    <input class="form-control" id="animalUniqueness" />
+                </div>
+                <div class="form-group">
+                    <label for="animalBehaviour">Behaviour</label>
+                    <input class="form-control" id="animalBehaviour" />
+                </div>
+                <div class="form-group">
+                    <label for="animalColour">Colour</label>
+                    <input class="form-control" id="animalColour" />
+                </div>
+                <button type="button" class="btn" onclick="save();">Save</button>
+                <button type="button" class="btn" onclick="reset();">Reset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
